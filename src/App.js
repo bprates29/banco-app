@@ -1,23 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Menu from './components/Menu';
+import Clientes from './components/Clientes';
+import Contas from './components/Contas';
+import Transacoes from './components/Transacoes';
+import './App.css'; 
 
 function App() {
+  const [section, setSection] = useState('clientes');
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Sistema Bancário</h1>
+      <Menu setSection={setSection} />
+      {section === 'clientes' && <Clientes />}
+      {section === 'contas' && <Contas />}
+      {section === 'transacoes' && <Transacoes />}
     </div>
   );
 }
