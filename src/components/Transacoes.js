@@ -4,6 +4,9 @@ import axios from 'axios';
 function Transacoes() {
   const [transacoes, setTransacoes] = useState([]);
   const [novaTransacao, setNovaTransacao] = useState({ id: '', valor: '', descricao: '', tipo: 'CREDITO' });
+  const [tipoBusca, setTipoBusca] = useState('CREDITO');
+  const [valorMinimo, setValorMinimo] = useState('');
+  const [contaId, setContaId] = useState('');
 
   useEffect(() => {
     buscarTransacoes();
@@ -28,6 +31,28 @@ function Transacoes() {
     axios.delete(`http://localhost:8080/transacoes/${id}`)
       .then(() => buscarTransacoes())
       .catch(error => console.error('Erro ao excluir transação:', error));
+  };
+
+  const buscarTransacoesPorTipo = () => {
+    axios.get('http://localhost:8080/transacoes/buscar/tipo', {
+      params: { tipo: tipoBusca }
+    })
+      .then(response => setTransacoes(response.data))
+      .catch(error => console.error('Erro ao buscar transações por tipo:', error));
+  };
+
+  const buscarTransacoesPorContaId = () => {
+    axios.get(`http://localhost:8080/transacoes/buscar/conta/${contaId}`)
+      .then(response => setTransacoes(response.data))
+      .catch(error => console.error('Erro ao buscar transações por conta:', error));
+  };
+
+  const buscarTransacoesPorValorMaiorQue = () => {
+    axios.get('http://localhost:8080/transacoes/buscar/valor', {
+      params: { valor: valorMinimo }
+    })
+      .then(response => setTransacoes(response.data))
+      .catch(error => console.error('Erro ao buscar transações por valor:', error));
   };
 
   return (
@@ -57,6 +82,7 @@ function Transacoes() {
           ))}
         </tbody>
       </table>
+
       <h3>Incluir Nova Transação</h3>
       <input
         type="text"
@@ -84,6 +110,31 @@ function Transacoes() {
         <option value="DEBITO">Débito</option>
       </select>
       <button onClick={incluirTransacao}>Incluir</button>
+
+      <h3>Buscar Transações por Tipo</h3>
+      <select value={tipoBusca} onChange={(e) => setTipoBusca(e.target.value)}>
+        <option value="CREDITO">Crédito</option>
+        <option value="DEBITO">Débito</option>
+      </select>
+      <button onClick={buscarTransacoesPorTipo}>Buscar</button>
+
+      <h3>Buscar Transações por Conta</h3>
+      <input
+        type="text"
+        placeholder="ID da Conta"
+        value={contaId}
+        onChange={(e) => setContaId(e.target.value)}
+      />
+      <button onClick={buscarTransacoesPorContaId}>Buscar</button>
+
+      <h3>Buscar Transações com Valor Maior que</h3>
+      <input
+        type="text"
+        placeholder="Valor Mínimo"
+        value={valorMinimo}
+        onChange={(e) => setValorMinimo(e.target.value)}
+      />
+      <button onClick={buscarTransacoesPorValorMaiorQue}>Buscar</button>
     </div>
   );
 }

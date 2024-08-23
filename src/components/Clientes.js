@@ -4,6 +4,8 @@ import axios from 'axios';
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [novoCliente, setNovoCliente] = useState({ id: '', nome: '', email: '', isAtivo: true });
+  const [nomeBusca, setNomeBusca] = useState('');
+  const [clientesAtivos, setClientesAtivos] = useState([]);
 
   useEffect(() => {
     buscarClientes();
@@ -30,9 +32,32 @@ function Clientes() {
       .catch(error => console.error('Erro ao excluir cliente:', error));
   };
 
+  const buscarClientesPorNome = () => {
+    axios.get('http://localhost:8080/clientes/buscar/nome', {
+      params: { nome: nomeBusca }
+    })
+      .then(response => setClientes(response.data))
+      .catch(error => console.error('Erro ao buscar clientes por nome:', error));
+  };
+
+  const listarClientesAtivos = () => {
+    axios.get('http://localhost:8080/clientes/ativos')
+      .then(response => setClientesAtivos(response.data))
+      .catch(error => console.error('Erro ao listar clientes ativos:', error));
+  };
+
   return (
     <div>
       <h2>Lista de Clientes</h2>
+      <input
+        type="text"
+        placeholder="Buscar por Nome"
+        value={nomeBusca}
+        onChange={(e) => setNomeBusca(e.target.value)}
+      />
+      <button onClick={buscarClientesPorNome}>Buscar</button>
+      <button onClick={listarClientesAtivos}>Listar Clientes Ativos</button>
+
       <table>
         <thead>
           <tr>
@@ -57,6 +82,7 @@ function Clientes() {
           ))}
         </tbody>
       </table>
+
       <h3>Incluir Novo Cliente</h3>
       <input
         type="text"
@@ -77,6 +103,28 @@ function Clientes() {
         onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
       />
       <button onClick={incluirCliente}>Incluir</button>
+
+      <h3>Clientes Ativos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clientesAtivos.map(cliente => (
+            <tr key={cliente.id}>
+              <td>{cliente.id}</td>
+              <td>{cliente.nome}</td>
+              <td>{cliente.email}</td>
+              <td>{cliente.isAtivo ? 'Ativo' : 'Inativo'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
